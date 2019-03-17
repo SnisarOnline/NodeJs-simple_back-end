@@ -1,0 +1,334 @@
+<div id="menuProductActions" >
+    <div class="btn-group-sm" role="group" aria-label="Product actions">
+        <button id="addProduct" class="btn btn-outline-primary" >Created 1 Product</button>
+        <button id="dellSelectProduct" class="btn btn-outline-primary" disabled > Dell select product</button>
+        <button id="dellAllProduct" class="btn btn-outline-primary " disabled > Dell all product</button>
+    </div>
+    <div id="popupWindow"></div>
+</div>
+<div id="productBody"></div>
+
+<script>
+//================================================================//
+//********** menu, product actions *******************************//
+//================================================================//
+$(document).ready(function() {
+    const userObject = JSON.parse( localStorage.getItem('user') );
+    if (userObject !== null) {
+        if (userObject.admin) {
+            document.getElementById('menuProductActions').style.display = 'block';
+        }
+    }
+    $('#addProduct').on("click", function(){
+        const popupWindow = document.getElementById('popupWindow');
+        popupWindow.style.display = "block";
+        popupWindow.style.opacity = "1";
+        popupWindow.style.zIndex = "999";
+
+        const nameForm = productForm(popupWindow); // создаем форму и вернем имя формы
+        // слушаем кнопу формы
+        $('#productFormButton').on("click", function(event){
+            event.preventDefault();
+
+            const dataObjectForm = gettingDataFromTheForm(nameForm);   // собираем данные из формы по имени формы
+
+            sendRequestToServer(dataObjectForm,"POST", "/api/products" ); // передаем данные на сервер
+
+            /* Закрываем форму после отправки */
+            popupWindow.style.display = "none";
+            popupWindow.style.opacity = "0";
+            popupWindow.style.zIndex = "-999";
+            $("#"+nameForm).remove();
+        });
+    });
+    $('#dellSelectProduct').on("click", function(e){
+        console.log( e );
+        // $('#popupWindow').style.display = "block";
+    });
+    $('#dellAllProduct').on("click", function(e){
+        console.log( e );
+        // $('#popupWindow').style.display = "block";
+    });
+});
+
+//================================================================//
+let allObjectProduct = []; // сохранненые все ПРОДУКТЫ ИЗ БАЗЫ
+//================================================================//
+
+//================================================================//
+//********** Получение всех продуктов ****************************//
+//================================================================//
+$(document).ready(function() {
+    $.ajax({
+        type: "GET",
+        url: '/api/products',
+        contentType: 'application/json; charset=utf-8',
+        beforeSend: function (xhr) {
+            const token = localStorage.getItem("token");
+            xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        }
+    }).done( (response)=> {
+        allObjectProduct = response;
+        viePage(allObjectProduct);
+    }).fail(function (err)  {
+        console.log( err );
+    });
+
+});
+
+
+//================================================================//
+//********** Изменение продукта **********************************//
+//================================================================//
+function changeProduct(index) {
+    const productChange = allObjectProduct[index];
+
+    const popupWindow = document.getElementById('popupWindow');
+    popupWindow.style.display = "block";
+    popupWindow.style.opacity = "1";
+    popupWindow.style.zIndex = "999";
+
+    const nameForm = productForm(popupWindow, productChange); // создаем форму и вернем имя формы
+    $('#productFormButton').on("click", function(event){
+        event.preventDefault();
+
+        const newObject = gettingDataFromTheForm(nameForm);  // собираем данные из формы по имени формы
+        sendRequestToServer(newObject, "PUT", "/api/products/" + productChange._id ); // передаем данные на сервер
+
+        /* Закрываем форму после отправки */
+        popupWindow.style.display = "none";
+        popupWindow.style.opacity = "0";
+        popupWindow.style.zIndex = "-999";
+        $("#"+nameForm).remove();
+    });
+}
+
+//================================================================//
+//********** Удаление продукта ***********************************//
+//================================================================//
+function dellProduct(id) {
+    sendRequestToServer({}, "DELETE", "/api/products/"+id);
+}
+
+// todo: ********** Buy product *****************************************//
+function buyProduct(id) {
+    console.log( 'buyProduct = ', id );
+}
+// todo: ********** Dell select product *********************************//
+// todo: ********** Dell all product ************************************//
+
+
+//================================================================//
+//********** Вывод всех продуктов ********************************//
+//================================================================//
+function viePage(arrObjectProduct) {
+    const userObject = JSON.parse( localStorage.getItem('user') );
+    let templateProduct = '';
+
+    for (let x in arrObjectProduct) {
+
+        let HTML = `<div class="card border-light mr-4 mb-4" >`;
+        let cardHeader=`<div class="card-header">
+                            <i class="fas fa-user-tie"></i>
+                            <span class="card-author"> ${arrObjectProduct[x].author} </span>
+                    `;
+        let dellBatton = `  <div class="card-dell input-group-text btn-outline-danger"
+                                    onclick="dellProduct('${arrObjectProduct[x]._id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>`;
+        let closedCardHeader = `</div>`;
+        let cardBody = `
+                        <img src="  ${arrObjectProduct[x].imgUrl}  " class="card-img-top" alt="#">
+                        <div class="card-body">
+                            <h5 class="card-title">  ${arrObjectProduct[x].name}  </h5>
+                            <h6 class="card-subtitle mb-2 text-muted">  ${arrObjectProduct[x].price} $ </h6>
+                            <p class="card-text">  ${arrObjectProduct[x].description}  </p>
+                        </div>
+                        <div class="card-footer ">`;
+        let buyBatton = `<button class="btn btn-primary" onclick="buyProduct(${x})">buy</button> `;
+        let changeProduct = `<button class="btn btn-primary float-right" onclick="changeProduct(${x})">Change Product</button> `;
+        let CloseHTML = "</div></div>";
+
+
+        if(userObject){
+            if(userObject.admin){
+                templateProduct += HTML + cardHeader + dellBatton+closedCardHeader + cardBody + changeProduct + CloseHTML
+            } else {
+                templateProduct += HTML + cardHeader+closedCardHeader + cardBody + buyBatton + CloseHTML
+            }
+        } else {
+            templateProduct += HTML + cardBody + CloseHTML;
+        }
+    }
+
+    setTimeout(()=>{
+        document.getElementById('productBody').innerHTML = templateProduct;
+    }, 100);
+}
+
+//================================================================//
+//********** Создание и удаление формы ***************************//
+//================================================================//
+function productForm(popupWindow, productChange) {
+    const userName = JSON.parse( localStorage.getItem('user') );
+    const nameForm = 'productForm';
+    if(!productChange){
+        productChange = {
+            imgUrl: '',
+            price:'',
+            category: '',
+            name:'',
+            description:'',
+            author: userName.name,
+        }
+    }
+
+    let Form = `
+        <div id="${nameForm}" class="card" role="alert" >
+            <div class="card-header alert alert-info ">
+                <strong class="mr-auto">Created one product</strong>
+                <button id="closeWindowForm" class="ml-2 mb-1 close"
+                     type="button"  data-dismiss="toast" aria-label="Close"
+                    > <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form  name="${nameForm}"  class="card-body flex-column" >
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-imgUrl">
+                            <i class="fas fa-camera"></i>
+                        </span>
+                    </div>
+                    <input type="url" name="imgUrl" class="form-control"
+                           placeholder="Product img Url "
+                           aria-label="imgUrl" aria-describedby="basic-imgUrl"
+                           value="${productChange.imgUrl}">
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-price">
+                            <i class="fas fa-dollar-sign"></i>
+                        </span>
+                    </div>
+                    <input type="number" name="price" class="form-control"
+                           placeholder="Product price "
+                           aria-label="price" aria-describedby="basic-price"
+                           value="${productChange.price }">
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-category">
+                             <i class="fas fa-bookmark"></i>
+                        </span>
+                    </div>
+                    <input type="text" name="category" class="form-control"
+                           placeholder="Product category "
+                           aria-label="category" aria-describedby="basic-category"
+                           value="${productChange.category }">
+                </div>
+
+                <div class="input-group " >
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-productName">
+                            <i class="fas fa-bookmark"></i>
+                        </span>
+                    </div>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="Product Name"
+                           aria-label="name" aria-describedby="basic-productName"
+                           value="${productChange.name }" >
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-productDescription">
+                            <i class="fas fa-align-justify"></i>
+                        </span>
+                    </div>
+                    <input type="text" name="description" class="form-control"
+                           placeholder="Product description"
+                           aria-label="description" aria-describedby="basic-productDescription"
+                           value="${productChange.description }" >
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-author">
+                            <i class="fas fa-user-tie"></i>
+                        </span>
+                    </div>
+                    <input type="text" name="author" class="form-control"
+                           placeholder="Product author"
+                           aria-label="author" aria-describedby="basic-author"
+                           value="${productChange.author }" disabled>
+                </div>
+
+                <button id="productFormButton"  class="btn btn-primary float-right" style="margin: 5px" >Created</button>
+            </form>
+        </div>
+            `;
+
+    $( popupWindow ).append( Form );
+
+    $('#closeWindowForm').on("click", function(){
+        popupWindow.style.display = "none";
+        popupWindow.style.opacity = "0";
+        popupWindow.style.zIndex = "-999";
+        $("#"+nameForm).remove();
+    });
+
+    return nameForm;
+}
+
+//================================================================//
+//********** Получение данных и Фильтрация ***********************//
+//================================================================//
+function gettingDataFromTheForm(nameForm){
+    const form = document.forms.namedItem(nameForm);
+    const allInput = form.getElementsByTagName('input');
+
+    const data = {};
+    for (let i = 0; i < allInput.length; i++) {
+        if (allInput[i].type === 'checkbox' && allInput[i].type === 'radio') {
+            data[allInput[i].name] = allInput[i].checked
+        }else
+        if(allInput[i].type === 'url') {
+            data[allInput[i].name] = allInput[i].value
+        } else
+        if(allInput[i].type !== 'url' && allInput[i].type !== 'checkbox') {
+            const val = allInput[i].value
+            let clearInputValue = val.replace(/[.,:;+*"'<({[\]})>|\\^!~%&#@]/g, ' ').replace(/\s\s+/g, ' ');
+            data[allInput[i].name] = clearInputValue;
+        }
+    }
+
+    return data;
+}
+
+//================================================================//
+//********** Отправка данных на сервер ***************************//
+//================================================================//
+function sendRequestToServer(data, type, url){
+    $.ajax({
+        type: type,
+        url: url,
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: false,
+        beforeSend: function (xhr) {
+            const token = localStorage.getItem("token");
+            xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        }
+    }).done(function (response) {
+        window.location.replace("/");
+    }).fail(function (err)  {
+        console.log( err );
+    });
+}
+
+</script>

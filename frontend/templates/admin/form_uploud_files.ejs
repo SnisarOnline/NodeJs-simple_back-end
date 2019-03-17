@@ -1,0 +1,142 @@
+<div id="uploadFiles">
+    <div class="list-group " id="listGroupFiles">
+        <a href="#" class="list-group-item list-group-item-action list-group-item-primary"> Cras justo odio </a>
+        <a href="#" class="list-group-item list-group-item-action list-group-item-primary">Dapibus ac facilisis in</a>
+        <a href="#" class="list-group-item list-group-item-action list-group-item-primary">Morbi leo risus</a>
+        <a href="#" class="list-group-item list-group-item-action list-group-item-primary">Porta ac consectetur ac</a>
+        <a href="#" class="list-group-item list-group-item-action list-group-item-dark" tabindex="-1" aria-disabled="true">Vestibulum at eros</a>
+
+    </div>
+    <div style="flex-grow: 3;">
+        <form method="post" enctype="multipart/form-data" action="http://localhost:4200/api/upload"
+              name="uploadForm" id="uploadForm" >
+            <div class="custom-file">
+                <!-- https://getbootstrap.com/docs/4.2/components/forms/?#file-browser -->
+                <input type="file" class="custom-file-input" id="customFile" name="file">
+                <label class="custom-file-label" for="customFile" data-browse="Choose" >Choose file</label>
+            </div>
+            <button class="upload-button">Загрузить</button>
+        </form>
+        <div class="vie-file">
+            lorem500
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    //================================================================//
+    //********** menu, Choose file ***********************************//
+    //================================================================//
+    $(document).ready(function() {
+
+        /*$('#uploadForm').on("submit", function(event){
+            event.preventDefault();
+
+            const uploadForm = document.forms.namedItem('uploadForm');
+            let formData = new FormData(uploadForm);   // собираем данные из формы по имени формы
+
+            console.log( 'uploadForm = ', uploadForm );
+            console.log( 'dataObjectForm = ', formData );
+
+            sendFileToServer(formData, "POST", "/api/upload" ); // передаем данные на сервер
+        });*/
+
+    });
+
+
+    //================================================================//
+    let allObjectFiles = []; // сохранненые все ПРОДУКТЫ ИЗ БАЗЫ
+    //================================================================//
+
+
+    //================================================================//
+    //********** Получение всех продуктов ****************************//
+    //================================================================//
+    // $(document).ready(function() {
+    //     $.ajax({
+    //         type: "GET",
+    //         url: '/api/products',
+    //         contentType: 'application/json; charset=utf-8',
+    //         beforeSend: function (xhr) {
+    //             const token = localStorage.getItem("token");
+    //             xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+    //             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    //         }
+    //     }).done( (response)=> {
+    //         allObjectFiles = response;
+    //         // viePage(allObjectFiles);
+    //     }).fail(function (err)  {
+    //         console.log( err );
+    //     });
+    //
+    // });
+
+
+    //================================================================//
+    //********** Удаление продукта ***********************************//
+    //================================================================//
+    function dellProduct(id) {
+        sendRequestToServer({}, "DELETE", "/api/products/"+id);
+    }
+
+
+    //================================================================//
+    //********** Вывод всех продуктов ********************************//
+    //================================================================//
+    function viePage(allObjectFiles) {
+
+        let templatelistGroupFiles = '';
+
+        for (let x in allObjectFiles) {
+            let listFile = ` <a href="${x}" class="list-group-item list-group-item-action list-group-item-primary"> ${allObjectFiles[x].name } </a>`
+            templatelistGroupFiles += listFile;
+        }
+
+        setTimeout(()=>{
+            document.getElementById('listGroupFiles').innerHTML = templatelistGroupFiles;
+        }, 100);
+    }
+
+
+    //================================================================//
+    //********** Получение данных и Фильтрация ***********************//
+    //================================================================//
+    function gettingDataFromTheForm(form){
+        const allInput = form.getElementsByTagName('input');
+
+        const data = {};
+        for (let i = 0; i < allInput.length; i++) {
+            data[allInput[i].name] = allInput[i].value;
+        }
+
+        return data;
+    }
+
+
+    //================================================================//
+    //********** Отправка данных на сервер ***************************//
+    //================================================================//
+    function sendFileToServer(data, type, url){
+        $.ajax({
+            type: type,
+            url: url,
+            data: data,
+            dataType: 'multipart/form-data',
+            processData: false,
+            async: false,
+            beforeSend: function (xhr) {
+                const token = localStorage.getItem("token");
+                xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+            }
+        }).done(function (response) {
+            console.log( response );
+        }).fail(function (err)  {
+            console.log( err );
+        });
+    }
+
+</script>
+

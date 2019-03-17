@@ -1,0 +1,157 @@
+html, body{}
+
+/*************************** Header **********************************/
+header{
+  padding: .375rem .75rem;
+}
+header .title-img .favicon{
+  width: 80%;
+}
+header .title-img:after {
+  content: 'odeJS'; /* Добавляем перед текстом открывающую кавычку */
+  position: absolute;
+  bottom: -3px;
+  left: 60px;
+  color: #319faf;
+}
+header .title{
+  padding: .375rem .75rem;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+}
+
+/************************* Main Page **********************************/
+#error_windows{
+  /* всплывающие окно сообщений */
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10%;
+  margin: 0 auto;
+  width: 350px;
+  height: auto;
+  z-index: -999;
+}
+main{
+  /* главный блок контента */
+  width: 100%;
+}
+
+/* * * * Старт формы регистрации * * * */
+main #authorization form {
+  /* формы */
+  width: 300px;
+  margin: 0 auto;
+}
+main #authorization form[name="registration"] {
+  /* форма регистрации */
+  display: none;
+}
+main #authorization .switch_form {
+  /* Кнопки переключения форм */
+  width: 100%;
+  align-items: inherit;
+  justify-content: center;
+  margin: 40px auto;
+}
+main #authorization .switch_form button{
+  /* Кнопки переключения форм */
+  margin: 5px;
+}
+main #authorization form .input-group:first-child{
+  /* Оглавление формы */
+  padding: 10px 5px 5px 5px;
+  justify-content: center;
+}
+main form .input-group{
+  /* Отступы между полями */
+  margin: 2px auto;
+  min-width: 100%;
+}
+main #authorization form div:last-child{
+  /* Кнопка входа */
+  margin: 5px auto;
+  overflow: hidden;
+}
+/* * * * Конец формы регистрации * * * */
+
+/* * * * Старт продукт * * * */
+main #productBody{
+  /* Прайс продуктов */
+  display: flex;
+  flex-wrap: wrap;
+  margin: 30px 0 40px;
+}
+main #menuProductActions {
+  /* меню управления продуктами */
+  display: none;
+  margin: 5px;
+  position: relative;
+}
+main #menuProductActions #popupWindow {
+  /* Всплывающие окно создания/редактирования продукта */
+  position: absolute;
+  width: 600px;
+  top: 60px;
+  left: 50%;
+  margin-left: -25%;
+  box-shadow: 1px 2px 15px #000;
+  opacity: 0;
+  display: none;
+  z-index: -999;
+}
+main #productBody .card{
+  /* карточка продукта */
+  flex-grow: 1;
+  max-width: 16rem;
+  box-shadow: 3px 2px 10px rgba(0,0,0,0.5);
+  font-size: 14px;
+}
+main #productBody .card .card-author{
+  /* авторы карточек */
+  color: rgba(0,0,0,0.5);
+}
+main #productBody .card img{
+  /* картинка продукта */
+}
+main #productBody .card .card-dell{
+  /* кнопка удаления карточки */
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 3px 3px;
+  margin: 2px;
+}
+/* * * * Конец продукт * * * */
+/* * * * Старт Загрузка файлов * * * */
+main #uploadFiles {
+  display: flex;
+}
+main #uploadFiles .list-group{
+  margin: 15px 5px 10px 0px;
+  flex-grow: 1;
+  min-width: 300px;
+}
+main #uploadFiles .custom-file {
+  margin: 15px 0px 10px 5px;
+
+}
+main #uploadFiles .vie-file {
+  margin: 15px 0px 10px 5px;
+  padding: 10px 10px 10px 15px;
+  background: #e9ecef;
+  box-shadow: 0px 1px 10px #666;
+  max-height: 400px;
+  height: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+/* * * * Конец Загрузка файлов* * * */
+
+/************************** Footer ************************************/
+footer{}
+footer a{
+  color: white;
+}

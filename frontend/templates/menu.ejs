@@ -1,0 +1,183 @@
+<ul class="nav justify-content-end">
+
+    <li class="nav-item" id="MainPage" >
+        <a href="/" class="btn btn-primary" >Main page</a>
+    </li>
+
+    <li class="dropdown">
+        <!-- https://getbootstrap.com/docs/4.2/components/dropdowns/#single-button -->
+        <button id="menuUser"   style="display: none"
+                class="btn btn-primary dropdown-toggle"
+                type="button"  data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+            User
+        </button>
+        <div class="dropdown-menu" aria-labelledby="menuUser" >
+            <a class="dropdown-item" href="/user">Профиль пользователя </a>
+            <a class="dropdown-item disabled" href="#" >Купленные продукты</a>
+            <a class="dropdown-item disabled" href="#" >Удалить ака</a>
+            <a class="dropdown-item disabled" href="#" >Something else here</a>
+            <div class="dropdown-divider"></div>
+            <button id="menuUpload" class="btn dropdown-item" style="display: none" >Upload file</button>
+            <button id="menuAllUsers" class="btn dropdown-item" style="display: none" >All Users</button>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a href="/logout" id="menuLogOut" class="btn btn-primary" style="display: none" >log out</a>
+        <!--<button id="menuLogOut" class="btn btn-primary" >log out</button>-->
+        <!--<button id="menuLogIn" class="btn btn-primary" >Log in</button>-->
+        <a href="/login" id="menuLogIn" class="btn btn-primary" >Log in</a>
+    </li>
+</ul>
+
+
+<script>
+$(document).ready(function() {
+
+    const userToken = Boolean(localStorage.getItem('token'));
+    const userObject = JSON.parse( localStorage.getItem('user') );
+    const logIn = document.getElementById('menuLogIn');
+    const logOut = document.getElementById('menuLogOut');
+
+    if (userToken) {
+        logIn.style.display = 'none';
+        logOut.style.display = 'block';
+    } else {
+        logIn.style.display = 'block';
+        logOut.style.display = 'none';
+    }
+
+    if (userObject !== null) {
+        if (userObject.admin) {
+            document.getElementById('menuUser').style.display = 'block';
+            document.getElementById('menuUpload').style.display = 'block';
+            document.getElementById('menuAllUsers').style.display = 'block';
+        } else {
+            document.getElementById('menuUser').style.display = 'block';
+        }
+    }
+
+    $('#menuLogIn').on("click", function(){
+        if (userToken) {
+            logIn.style.display = 'none';
+            logOut.style.display = 'block';
+        } else {
+            logIn.style.display = 'block';
+            logOut.style.display = 'none';
+        }
+    });
+    $('#menuLogOut').on("click", function(){
+        if (userToken) {
+            logIn.style.display = 'none';
+            logOut.style.display = 'block';
+        } else {
+            logIn.style.display = 'block';
+            logOut.style.display = 'none';
+        }
+    });
+});
+
+//================================================================//
+//********************* MainPage ****************//
+//================================================================//
+/*
+    $(document).ready(function() {
+        $('#MainPage').on("click", function(){
+            $.ajax({
+                type: "GET",
+                url: '/',
+                contentType: 'application/json; charset=utf-8',
+                beforeSend: function (xhr) {
+                    const token = localStorage.getItem("token");
+                    xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+                    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                }
+            }).done(function (response) {
+                document.write(response);
+            }).fail(function (err)  {
+                console.log( err );
+            });
+        });
+    });
+*/
+
+//================================================================//
+//********************* Upload ****************//
+//================================================================//
+$(document).ready(function() {
+    $('#menuUpload').on("click", function(){
+        $.ajax({
+            type: "GET",
+            url: '/upload',
+            contentType: 'application/json; charset=utf-8',
+            beforeSend: function (xhr) {
+                const token = localStorage.getItem("token");
+                xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+                xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            }
+        })
+            .done(function (response) {
+                // $( "#body-main" ).append( response );
+                // $( "#body-main" ).firstChild( response );
+                $( "body" ).html(response);
+                // $( "body" ).innerHTML = response ;
+                // document.getElementById('body-main').innerHTML = response;
+            }).fail(function (err)  {
+                console.log( err );
+            });
+    });
+});
+
+//================================================================//
+//********************* logout ****************//
+//================================================================//
+$(document).ready(function() {
+    $('#menuLogOut').on("click", function(){
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // $.ajax({
+        //     type: "GET",
+        //     url: '/logout',
+        //     contentType: 'application/json; charset=utf-8',
+        //     beforeSend: function (xhr) {
+        //         const token = localStorage.getItem("token");
+        //         xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+        //         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        //     }
+        // })
+        // .done(function (response) {
+        //     // document.getElementById('body-main').innerHTML = response;
+        //     $( "body" ).html(response);
+        // }).fail(function (err)  {
+        //     console.log( err );
+        // });
+    });
+});
+
+//================================================================//
+//********************* login ****************//
+//================================================================//
+/*
+    $(document).ready(function() {
+        $('#menuLogIn').on("click", function(){
+            $.ajax({
+                type: "GET",
+                url: '/login',
+                contentType: 'application/json; charset=utf-8',
+                beforeSend: function (xhr) {
+                    const token = localStorage.getItem("token");
+                    xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+                    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                }
+            });
+                // .done(function (response) {
+                //     document.getElementById('body-main').innerHTML = response;
+                // }).fail(function (err)  {
+                //     console.log( err );
+                // });
+        });
+    });
+*/
+
+</script>

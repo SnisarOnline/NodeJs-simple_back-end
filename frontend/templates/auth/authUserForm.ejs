@@ -1,0 +1,242 @@
+<main id="authorization">
+    <div class="container">
+        <div class="row">
+            <div class="switch_form  form-inline ">
+                <button id="switchFormReg" class="btn btn-outline-success" >Registration</button>
+                <button id="switchFormAuth" class="btn btn-sm btn-outline-secondary" >Authorization</button>
+            </div>
+
+            <form  name="authorization" id="formAuthorization" class="flex-column" >
+                <div class="input-group alert alert-info ">
+                    <h3>Authorization</h3>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-email">
+                            <i class="fas fa-at"></i>
+                        </span>
+                    </div>
+                    <input type="email" name="email" class="form-control"
+                           placeholder="User email" aria-label="Email" aria-describedby="basic-email"
+                           value="email@email.com">
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-password">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                    <input type="password" name="password" class="form-control"
+                           placeholder="Password" aria-label="Password" aria-describedby="basic-password"
+                           value="password">
+                </div>
+
+                <div>
+                    <button id="formBtnAuth" class="btn btn-primary float-right" >
+                        Log in <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </div>
+
+            </form>
+
+            <form  name="registration"  id="formRegistration" class="flex-column"  >
+                <div class="input-group alert alert-info">
+                    <h3>Registration</h3>
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-username">
+                            <i class="fas fa-user-tie"></i>
+                        </span>
+                    </div>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="Username" aria-label="Username" aria-describedby="basic-username"
+                           value="admin">
+                </div>
+
+                <div class="input-group ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-email">
+                            <i class="fas fa-at"></i>
+                        </span>
+                    </div>
+                    <input type="email" name="email" class="form-control"
+                           placeholder="User email" aria-label="Email" aria-describedby="basic-email"
+                           value="admin@admin.com">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-password">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                    <input type="password" name="password" class="form-control"
+                           placeholder="Password" aria-label="Password" aria-describedby="basic-password"
+                           value="admin">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="fab fa-pied-piper-alt"></i>
+                        </span>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label" for="gridCheck">
+                            <input class="form-check-input" type="checkbox" name="admin">
+                            I'm Admin ?
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <button id="formBtnReg" class="btn btn-primary float-right" >
+                        new User <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</main>
+
+
+<script>
+/*
+    function showError(container, errorMessage) {
+        container.classList.add('is-invalid');
+
+        const msgElem = document.createElement('span');
+        msgElem.className = "invalid-feedback";
+        msgElem.innerHTML = errorMessage;
+        container.parentNode.appendChild(msgElem);
+
+        setTimeout(function() {
+            container.classList.remove('is-invalid');
+            container.parentNode.removeChild(msgElem);
+        }, 5000);
+    }
+*/
+
+//================================================================//
+//********** menu, action forms **********************************//
+//================================================================//
+$(document).ready(function() {
+    //*********** forms ************//
+    const formAuth = document.forms.namedItem('authorization');
+    const formRegist = document.forms.namedItem('registration');
+    //************ menu ************//
+    $('#switchFormAuth').on("click", function(){
+        $('#switchFormReg').removeClass("btn btn-sm btn-outline-secondary").addClass("btn btn-outline-success")
+        $('#switchFormAuth').removeClass("btn btn-outline-success").addClass("btn btn-sm btn-outline-secondary")
+        formRegist.style.display = 'none';
+        formAuth.style.display = 'block';
+    });
+    $('#switchFormReg').on("click", function(){
+        $('#switchFormAuth').removeClass("btn btn-sm btn-outline-secondary").addClass("btn btn-outline-success")
+        $('#switchFormReg').removeClass("btn btn-outline-success").addClass("btn btn-sm btn-outline-secondary")
+        formAuth.style.display = 'none';
+        formRegist.style.display = 'block';
+    });
+    //******** action forms ********//
+    $('#formAuthorization').on("submit", function(event){
+        event.preventDefault();
+
+        const allInput = formAuth.getElementsByTagName('input');
+
+        for (let i = 0; i < allInput.length; i++) {
+            validate(allInput[i]);
+        }
+
+        const dataObjectForm = gettingDataForm(allInput);   // собираем данные из формы по имени формы
+
+        console.log( 'formBtnAuth dataObjectForm = ', dataObjectForm );
+        sendRequestToApi(dataObjectForm, 'POST', '/api/auth');
+    });
+    $('#formRegistration').on("submit", function(event){
+        event.preventDefault();
+
+        const allInput = formRegist.getElementsByTagName('input');
+
+        for (let i = 0; i < allInput.length; i++) {
+            validate(allInput[i]);
+        }
+
+        const dataObjectForm = gettingDataForm(allInput);   // собираем данные из формы по имени формы
+
+        sendRequestToApi(dataObjectForm, 'POST', '/api/user');
+    });
+});
+
+//================================================================//
+//********** Валидация данных из формы ***************************//
+//================================================================//
+function validate(input) {
+
+    const RegExpSuperEmail  = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const RegExpUserEmail  = /^(\S+)@([a-z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+$/;
+    const RegExpPassword =  /[!%&#\\^*?\/~="';:,+]/;
+
+    if (input.value == ''){
+        // showError(input, 'Пожалуйста заполние ');
+        showPopup(input.name, ''+ input.name, 'Пожалуйста заполние ' + input.name);
+        return
+    } else if ( RegExpPassword.test(input.value) ){
+        // showError(input, 'Недопустимые символы ');
+        showPopup(input.name, ''+ input.name, 'Недопустимые символы ');
+        return
+    } else if ( input.value.length <= 3 && input.type !== 'checkbox'){
+        // showError(input, 'минимально 4');
+        showPopup(input.name, ''+ input.name, 'Совсем маловато будет, от 4');
+        return
+    }
+}
+
+//================================================================//
+//********** получение данных из формы ***************************//
+//================================================================//
+function gettingDataForm(allInput) {
+    const data = {};
+
+    for (let i = 0; i < allInput.length; i++) {
+        if (allInput[i].type === 'checkbox') {
+            data[allInput[i].name] = allInput[i].checked
+        } else {
+            data[allInput[i].name] = allInput[i].value
+        }
+    }
+
+    return data;
+}
+
+//================================================================//
+//********** отправка данных на сервер ***************************//
+//================================================================//
+function sendRequestToApi(data, type, url){
+    $.ajax({
+        type: type,
+        url: url,
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: false,
+        beforeSend: function (xhr) {
+            const token = localStorage.getItem("token");
+            xhr.setRequestHeader("Authorization", 'Bearer :'+ token);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        }
+    }).done(function (response) {
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+        window.location.replace("/");
+    }).fail(function (err)  {
+        console.log( 'err = ', err );
+        showPopup('error', `Request Error` , err.responseJSON.message);
+    });
+}
+
+</script>

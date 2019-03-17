@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head >
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>NodeJS API</title>
+
+    <link rel="icon" href="./img/favicon.ico">
+    <!-- https://fontawesome.com/icons?d=gallery -->
+    <link rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+          integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+          crossorigin="anonymous">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js"></script> <!-- 80kb / 300ms -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script> &lt;!&ndash; 75kb / 300ms &ndash;&gt;-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  &lt;!&ndash; 30kb / 200ms&ndash;&gt;-->
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+          crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="style/index.css" >
+
+    <script src="javaScript/httpConnection.js"></script>
+</head>
+
+
+
+<body>
+    <header class="navbar-light bg-primary">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-1 title-img">
+                    <a href="/">
+                        <img class="favicon" src="./img/favicon.png" alt="title">
+                    </a>
+                </div>
+                <div class="col-sm-6 align-bottom">
+                    <div class="title" > API Example</div>
+                </div>
+                <div class="col-sm-5">
+                    <%- include templates/menu.ejs%>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <div id="error_windows">
+        <div role="alert" aria-live="assertive" aria-atomic="true" class="toast" data-autohide="false">
+            <div class="toast-header">
+                <span class="rounded mr-2" id="basic-email">
+                    <i class=" "></i>
+                </span>
+                <strong class="mr-auto">Error</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"
+                        onclick="closePopup()"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                Hello, world! This is a toast message.
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="row">
+            <main id="body-main">
+                <%/*routPath = получаем из файла routes*/
+                switch (routPath){
+                    case 'login':
+                    case 'logout':
+                    %>
+                        <%-include templates/auth/authUserForm.ejs %>
+                    <%
+                        break
+                    case 'main':
+                    %>
+                        <%-include ./templates/product.ejs %>
+                    <%
+                        break
+                    case 'user':
+                    %>
+                        <%-include  templates/auth/userPage.ejs %>
+                    <%
+                        break
+                    case 'admin':
+                    %>
+                        <%-include  templates/admin/admin.ejs %>
+                    <%
+                    break
+                    case 'upload':
+                    %>
+                        <%- include templates/admin/form_uploud_files.ejs %>
+                    <%
+                        break
+                    default:
+                    %>
+                        <%-include templates/error.ejs %>
+                    <%
+                        break
+                }
+                %>
+
+            </main>
+        </div>
+    </div>
+
+
+
+    <footer class="page-footer font-small blue pt-1 bg-primary">
+        <!-- Copyright -->
+        <div class="footer-copyright text-center py-2">
+            <a href="https://github.com/SnisarOnline"> 2019 Created <i class="fab fa-github-alt"></i> :</a>
+            <a href="https://www.linkedin.com/in/snisarigor/" > Igor Snisar</a>
+        </div>
+        <!-- Copyright -->
+    </footer>
+
+
+
+
+    <script>
+        document.getElementById('body-main').style.minHeight = (
+            screen.height
+            -
+            document.getElementsByTagName('header')[0].clientHeight
+            -
+            document.getElementsByTagName('footer')[0].clientHeight
+            -
+            152
+        )+"px";
+
+        function showPopup(type, header, text ) {
+            let error_windows = document.getElementById('error_windows');
+            let toast_Dom = error_windows.getElementsByClassName('toast');
+            let toastHeader_Dom = error_windows.getElementsByClassName('toast-header');
+            let toastBody_Dom = error_windows.getElementsByClassName('toast-body');
+            let icon = error_windows.getElementsByTagName('i');
+
+            if (type == 'error') {
+                icon[0].className = 'fas fa-times'
+            } else if (type == 'username') {
+                // icon[0].className = 'fas fa-user'
+                icon[0].className = 'fas fa-user-tie'
+            } else if (type == 'email') {
+                icon[0].className = 'fas fa-at'
+            } else if (type == 'password') {
+                icon[0].className = 'fas fa-key'
+            } else if (type == 'info') {
+                icon[0].className = 'fas fa-exclamation';
+            } else {
+                icon[0].className = type
+            }
+
+            toastHeader_Dom[0].getElementsByClassName('mr-auto')[0].innerText = header;
+            toastBody_Dom[0].innerText = text;
+            error_windows.style.zIndex = "999";
+            toast_Dom[0].style.opacity = "1";
+
+        }
+        function closePopup() {
+            let error_windows = document.getElementById('error_windows');
+            let toast_Dom = error_windows.getElementsByClassName('toast');
+            let icon = error_windows.getElementsByTagName('i');
+            toast_Dom[0].style.opacity = "0";
+            error_windows.style.zIndex = "-999";
+            icon[0].className = '';
+        }
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+
+
+
+
+</html>
